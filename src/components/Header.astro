@@ -1,0 +1,39 @@
+---
+const categories = [
+  { name: 'Boho Decor', slug: 'boho-decor' },
+  { name: 'Tattoo Ideas', slug: 'tattoo-ideas' },
+  { name: 'Nail Art', slug: 'nail-art' },
+  { name: 'Fashion', slug: 'fashion' },
+  { name: 'Tarot', slug: 'tarot-spirituality' },
+  { name: 'Kitchen', slug: 'kitchen-recipes' },
+  { name: 'Perfume', slug: 'perfume-fragrance' },
+  { name: 'Makeup', slug: 'makeup-beauty' },
+  { name: 'Hair', slug: 'hair-hairstyles' },
+  { name: 'Jewelry', slug: 'jewelry-accessories' },
+  { name: 'Self-Care', slug: 'self-care-wellness' },
+  { name: 'Wedding', slug: 'wedding-bridal' },
+];
+---
+
+<header class="bg-white/80 backdrop-blur-sm border-b border-brand-blush/30 sticky top-0 z-50">
+  <div class="max-w-6xl mx-auto px-4 py-4">
+    <div class="flex items-center justify-between">
+      <a href="/" class="font-display text-2xl font-bold text-brand-dark">
+        Her<span class="text-brand-sage">Vision</span>Craft
+      </a>
+      <nav class="hidden md:flex items-center gap-1">
+        <a href="/about" class="px-3 py-2 text-sm text-brand-muted hover:text-brand-dark transition-colors">About</a>
+      </nav>
+    </div>
+    <nav class="flex gap-2 mt-3 overflow-x-auto pb-2 scrollbar-hide">
+      {categories.map(cat => (
+        <a
+          href={`/${cat.slug}/`}
+          class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-full bg-brand-blush/20 text-brand-dark hover:bg-brand-blush/40 transition-colors"
+        >
+          {cat.name}
+        </a>
+      ))}
+    </nav>
+  </div>
+</header>

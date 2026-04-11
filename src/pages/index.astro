@@ -1,17 +1,54 @@
 ---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
 
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout
+  title="Inspiration for Beauty, Home & Style"
+  description="HerVisionCraft — curated ideas for the modern woman. Boho decor, tattoo ideas, nail art, fashion, and more."
+>
+  <!-- Hero -->
+  <section class="max-w-6xl mx-auto px-4 pt-12 pb-8 text-center">
+    <h1 class="font-display text-4xl md:text-5xl font-bold text-brand-dark mb-4">
+      Inspiration for the <span class="text-brand-sage">Modern Woman</span>
+    </h1>
+    <p class="text-brand-muted text-lg max-w-2xl mx-auto">
+      Curated ideas for beauty, home, style, and soul. Find your next obsession.
+    </p>
+  </section>
+
+  <!-- Post Grid (Masonry-style) -->
+  <section class="max-w-6xl mx-auto px-4 pb-16">
+    <div class="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
+      {posts.map((post) => (
+        <a
+          href={`/blog/${post.id}/`}
+          class="block break-inside-avoid bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group"
+        >
+          {post.data.featured_image && (
+            <img
+              src={post.data.featured_image}
+              alt={post.data.title}
+              class="w-full object-cover group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+            />
+          )}
+          <div class="p-5">
+            <span class="text-xs font-medium text-brand-sage uppercase tracking-wider">
+              {post.data.category.replace(/-/g, ' ')}
+            </span>
+            <h2 class="font-display text-lg font-semibold mt-1 group-hover:text-brand-sage transition-colors">
+              {post.data.title}
+            </h2>
+            <p class="text-brand-muted text-sm mt-2 line-clamp-2">
+              {post.data.description}
+            </p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
