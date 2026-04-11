@@ -3,7 +3,7 @@ title: "19 Stunning Balayage Hair Color Ideas Before and After"
 description: "Get inspired by these gorgeous balayage hair color before and after transformations! From brunette to blonde, find your perfect look."
 category: "hair-hairstyles"
 tags: ["balayage", "hair-color", "brunette-hair", "blonde-highlights", "hair-transformation"]
-pinterest_title: "19 Stunning Balayage Hair Color Ideas Before and After | Her Vision Craft"
+pinterest_title: "19 Stunning Balayage Hair Color Ideas Before and After | velvetgrl"
 date: 2026-04-15
 draft: false
 ---

@@ -3,7 +3,7 @@ title: "17 Modern Boho Living Room Ideas for Effortless Style"
 description: "Transform your space with these stunning modern boho living room ideas. Get inspired by chic decor that blends comfort with contemporary style."
 category: "boho-decor"
 tags: [modern boho, living room decor, boho style, home design, interior decorating]
-pinterest_title: "17 Dreamy Modern Boho Living Room Ideas You'll Love | Her Vision Craft"
+pinterest_title: "17 Dreamy Modern Boho Living Room Ideas You'll Love | velvetgrl"
 date: 2026-04-18
 draft: false
 ---

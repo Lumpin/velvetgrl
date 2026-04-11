@@ -3,7 +3,7 @@ title: "15 Best Drugstore Makeup Products That Rival High-End Brands"
 description: "Discover the best drugstore makeup products that perform just like luxury brands. These amazing drugstore dupes will save you money without sacrificing quality!"
 category: "makeup-beauty"
 tags: [drugstore makeup, makeup dupes, budget beauty, affordable makeup, beauty tips]
-pinterest_title: "15 Drugstore Makeup Products That Look Like Luxury | Her Vision Craft"
+pinterest_title: "15 Drugstore Makeup Products That Look Like Luxury | velvetgrl"
 date: 2026-04-13
 draft: false
 ---

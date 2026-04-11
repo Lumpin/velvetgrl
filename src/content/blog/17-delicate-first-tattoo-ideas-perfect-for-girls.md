@@ -3,7 +3,7 @@ title: "17 Delicate First Tattoo Ideas Perfect for Girls"
 description: "Discover beautiful first tattoo ideas for girls! From tiny florals to minimalist symbols - find the perfect delicate design for your debut ink."
 category: "tattoo-ideas"
 tags: [first-tattoo, small-tattoos, minimalist-tattoos, feminine-tattoos, delicate-ink]
-pinterest_title: "17 Gorgeous First Tattoo Ideas Every Girl Will Love | Her Vision Craft"
+pinterest_title: "17 Gorgeous First Tattoo Ideas Every Girl Will Love | velvetgrl"
 date: 2026-04-18
 draft: false
 ---

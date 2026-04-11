@@ -3,7 +3,7 @@ title: "21 Modern Boho Living Room Decor Ideas to Transform Your Space"
 description: "Transform your living room with these stunning modern boho decor ideas that blend minimalist style with bohemian charm perfectly."
 category: "boho-decor"
 tags: ["modern boho", "living room decor", "bohemian style", "home decorating", "interior design"]
-pinterest_title: "21 Modern Boho Living Room Ideas That Are Pure Magic | Her Vision Craft"
+pinterest_title: "21 Modern Boho Living Room Ideas That Are Pure Magic | velvetgrl"
 date: 2026-04-17
 draft: false
 ---

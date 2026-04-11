@@ -3,7 +3,7 @@ title: "17 Boho Kitchen Ideas That Feel Effortlessly Chic"
 description: "Discover stunning boho kitchen designs that blend warmth, texture, and free-spirited charm into your cooking space."
 category: "boho-decor"
 tags: ["boho", "kitchen", "home decor"]
-pinterest_title: "Boho Kitchen Ideas | Her Vision Craft"
+pinterest_title: "Boho Kitchen Ideas | velvetgrl"
 date: 2026-04-12
 draft: false
 featured_image: "/images/posts/boho-kitchen/hero.webp"

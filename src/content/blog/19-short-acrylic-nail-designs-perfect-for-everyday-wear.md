@@ -3,7 +3,7 @@ title: "19 Short Acrylic Nail Designs Perfect for Everyday Wear"
 description: "Discover stunning short acrylic nail designs that are perfect for daily wear. Easy nail art ideas for beginners and busy lifestyles!"
 category: "nail-art"
 tags: ["short-acrylic-nails", "everyday-nail-art", "nail-designs", "beginner-nails", "practical-manicures"]
-pinterest_title: "19 Gorgeous Short Acrylic Nail Designs for Daily Wear | Her Vision Craft"
+pinterest_title: "19 Gorgeous Short Acrylic Nail Designs for Daily Wear | velvetgrl"
 date: 2026-04-17
 draft: false
 ---

@@ -3,7 +3,7 @@ title: "21 Trendy Summer Outfits for Women That'll Turn Heads"
 description: "Discover 21 trendy summer outfits 2024 that are perfect for any occasion. From cute casual outfits to chic looks that'll make you shine."
 category: "fashion"
 tags: ["summer outfits", "trendy fashion", "casual outfits", "summer style", "women's fashion"]
-pinterest_title: "21 Trendy Summer Outfits That'll Turn Heads | Her Vision Craft"
+pinterest_title: "21 Trendy Summer Outfits That'll Turn Heads | velvetgrl"
 date: 2026-04-15
 draft: false
 ---
