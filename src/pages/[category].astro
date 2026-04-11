@@ -1,0 +1,74 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const categoryLabels: Record<string, string> = {
+    'boho-decor': 'Boho Decor & Home',
+    'tattoo-ideas': 'Tattoo Ideas',
+    'nail-art': 'Nail Art',
+    'fashion': 'Fashion & Outfits',
+    'tarot-spirituality': 'Tarot & Spirituality',
+    'kitchen-recipes': 'Kitchen & Recipes',
+    'perfume-fragrance': 'Perfume & Fragrance',
+    'makeup-beauty': 'Makeup & Beauty',
+    'hair-hairstyles': 'Hair & Hairstyles',
+    'jewelry-accessories': 'Jewelry & Accessories',
+    'self-care-wellness': 'Self-Care & Wellness',
+    'wedding-bridal': 'Wedding & Bridal',
+  };
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return Object.keys(categoryLabels).map(cat => ({
+    params: { category: cat },
+    props: {
+      category: cat,
+      label: categoryLabels[cat],
+      posts: posts
+        .filter(p => p.data.category === cat)
+        .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf()),
+    },
+  }));
+}
+
+const { category, label, posts } = Astro.props;
+---
+
+<BaseLayout
+  title={`${label} Ideas & Inspiration`}
+  description={`Browse our curated collection of ${label.toLowerCase()} ideas, tips, and inspiration.`}
+>
+  <section class="max-w-6xl mx-auto px-4 py-10">
+    <h1 class="font-display text-3xl md:text-4xl font-bold mb-2">{label}</h1>
+    <p class="text-brand-muted mb-10">Curated ideas and inspiration for {label.toLowerCase()}.</p>
+
+    {posts.length === 0 ? (
+      <p class="text-brand-muted text-center py-20">Posts coming soon!</p>
+    ) : (
+      <div class="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
+        {posts.map((post) => (
+          <a
+            href={`/blog/${post.id}/`}
+            class="block break-inside-avoid bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group"
+          >
+            {post.data.featured_image && (
+              <img
+                src={post.data.featured_image}
+                alt={post.data.title}
+                class="w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+              />
+            )}
+            <div class="p-5">
+              <h2 class="font-display text-lg font-semibold group-hover:text-brand-sage transition-colors">
+                {post.data.title}
+              </h2>
+              <p class="text-brand-muted text-sm mt-2 line-clamp-2">
+                {post.data.description}
+              </p>
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
+  </section>
+</BaseLayout>
