@@ -4,6 +4,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const featured = posts[0];
+const rest = posts.slice(1);
 ---
 
 <BaseLayout
@@ -20,19 +23,54 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
     </p>
   </section>
 
-  <!-- Post Grid (Masonry-style) -->
+  <!-- Featured Post -->
+  {featured && (
+    <section class="max-w-6xl mx-auto px-4 pb-10">
+      <a
+        href={`/blog/${featured.id}/`}
+        class="block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow group"
+      >
+        <div class="grid md:grid-cols-2 gap-0">
+          {featured.data.featured_image && (
+            <img
+              src={featured.data.featured_image}
+              alt={featured.data.title}
+              class="w-full h-64 md:h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              loading="eager"
+            />
+          )}
+          <div class="p-8 md:p-10 flex flex-col justify-center">
+            <span class="text-xs font-medium text-brand-sage uppercase tracking-wider mb-2">
+              {featured.data.category.replace(/-/g, ' ')}
+            </span>
+            <h2 class="font-display text-2xl md:text-3xl font-bold group-hover:text-brand-sage transition-colors mb-3">
+              {featured.data.title}
+            </h2>
+            <p class="text-brand-muted leading-relaxed mb-4">
+              {featured.data.description}
+            </p>
+            <time class="text-sm text-brand-muted" datetime={featured.data.date.toISOString()}>
+              {featured.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+            </time>
+          </div>
+        </div>
+      </a>
+    </section>
+  )}
+
+  <!-- Post Grid -->
   <section class="max-w-6xl mx-auto px-4 pb-16">
-    <div class="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
-      {posts.map((post) => (
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {rest.map((post) => (
         <a
           href={`/blog/${post.id}/`}
-          class="block break-inside-avoid bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group"
+          class="block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group"
         >
           {post.data.featured_image && (
             <img
               src={post.data.featured_image}
               alt={post.data.title}
-              class="w-full object-cover group-hover:scale-105 transition-transform duration-300"
+              class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
               loading="lazy"
             />
           )}
@@ -46,6 +84,9 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
             <p class="text-brand-muted text-sm mt-2 line-clamp-2">
               {post.data.description}
             </p>
+            <time class="text-sm text-brand-muted mt-3 block" datetime={post.data.date.toISOString()}>
+              {post.data.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            </time>
           </div>
         </a>
       ))}
