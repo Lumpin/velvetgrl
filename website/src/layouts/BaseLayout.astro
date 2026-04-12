@@ -29,6 +29,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL} />
     {image && <meta property="og:image" content={image} />}
+    <!-- Google Search Console -->
+    <meta name="google-site-verification" content="yE_57pwKnBLVmqDSKj4bRcmsC1HlWpztWQ570AE9bCQ" />
     <!-- Pinterest -->
     <meta name="p:domain_verify" content="541632eac0a364d840ac504902514939"/>
     <meta name="pinterest-rich-pin" content="true" />
