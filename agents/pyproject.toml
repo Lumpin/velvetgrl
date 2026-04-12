@@ -1,0 +1,21 @@
+[project]
+name = "velvetgrl-agents"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "anthropic>=0.40.0",
+    "Pillow>=11.0.0",
+    "httpx>=0.28.0",
+    "apscheduler>=3.10.0,<4.0.0",
+    "click>=8.1.0",
+    "rich>=13.0.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "pytest-asyncio>=0.24"]
+
+[tool.setuptools]
+packages = ["agents"]
+
+[tool.setuptools.package-dir]
+agents = "."

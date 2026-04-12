@@ -1,0 +1,62 @@
+{
+  "boho-decor": {
+    "label": "Boho Decor & Home",
+    "seed_keywords": ["boho decor", "boho home", "bohemian style", "boho kitchen", "boho bedroom", "boho living room"],
+    "pinterest_boards": ["Boho Home Inspiration", "Bohemian Decor Ideas", "Boho Kitchen & Living"]
+  },
+  "tattoo-ideas": {
+    "label": "Tattoo Ideas",
+    "seed_keywords": ["tattoo ideas", "small tattoo", "minimalist tattoo", "tattoo for women", "tattoo design", "cute tattoo"],
+    "pinterest_boards": ["Tattoo Inspiration", "Minimalist Tattoos", "Tattoo Ideas for Women"]
+  },
+  "nail-art": {
+    "label": "Nail Art",
+    "seed_keywords": ["nail art", "nail design", "nail ideas", "acrylic nails", "gel nails", "nail inspo"],
+    "pinterest_boards": ["Nail Art Ideas", "Nail Designs", "Manicure Inspiration"]
+  },
+  "fashion": {
+    "label": "Fashion & Outfits",
+    "seed_keywords": ["outfit ideas", "fashion inspiration", "casual outfits", "date night outfit", "street style"],
+    "pinterest_boards": ["Fashion Inspiration", "Outfit Ideas", "Street Style"]
+  },
+  "tarot-spirituality": {
+    "label": "Tarot & Spirituality",
+    "seed_keywords": ["tarot cards", "tarot reading", "spirituality", "crystals", "manifestation", "moon ritual"],
+    "pinterest_boards": ["Tarot & Divination", "Spiritual Living", "Crystal Healing"]
+  },
+  "kitchen-recipes": {
+    "label": "Kitchen & Recipes",
+    "seed_keywords": ["easy recipes", "kitchen ideas", "meal prep", "healthy recipes", "baking ideas"],
+    "pinterest_boards": ["Kitchen Inspiration", "Easy Recipes", "Healthy Cooking"]
+  },
+  "perfume-fragrance": {
+    "label": "Perfume & Fragrance",
+    "seed_keywords": ["best perfume", "fragrance", "perfume for women", "luxury perfume", "perfume collection"],
+    "pinterest_boards": ["Perfume Collection", "Fragrance Inspiration", "Luxury Scents"]
+  },
+  "makeup-beauty": {
+    "label": "Makeup & Beauty",
+    "seed_keywords": ["makeup look", "makeup tutorial", "beauty tips", "eyeshadow ideas", "lipstick shades"],
+    "pinterest_boards": ["Makeup Looks", "Beauty Inspiration", "Makeup Tutorials"]
+  },
+  "hair-hairstyles": {
+    "label": "Hair & Hairstyles",
+    "seed_keywords": ["hairstyle ideas", "hair color", "braids", "curly hair", "hair tutorial", "bob haircut"],
+    "pinterest_boards": ["Hairstyle Inspiration", "Hair Color Ideas", "Braids & Updos"]
+  },
+  "jewelry-accessories": {
+    "label": "Jewelry & Accessories",
+    "seed_keywords": ["jewelry ideas", "layered necklace", "ear piercing", "rings", "bracelets", "accessories"],
+    "pinterest_boards": ["Jewelry Inspiration", "Accessories & Style", "Layered Jewelry"]
+  },
+  "self-care-wellness": {
+    "label": "Self-Care & Wellness",
+    "seed_keywords": ["self care routine", "skincare", "journaling", "wellness tips", "mental health", "morning routine"],
+    "pinterest_boards": ["Self-Care Ideas", "Wellness & Mindfulness", "Skincare Routines"]
+  },
+  "wedding-bridal": {
+    "label": "Wedding & Bridal",
+    "seed_keywords": ["wedding ideas", "bridal makeup", "wedding dress", "wedding decor", "bridesmaid dresses"],
+    "pinterest_boards": ["Wedding Inspiration", "Bridal Beauty", "Wedding Decor Ideas"]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "anthropic_api_key": "",
+  "unsplash_access_key": "",
+  "pexels_api_key": "",
+  "image_generation_api": "flux",
+  "flux_api_key": "",
+  "pinterest_email": "",
+  "pinterest_password": "",
+  "schedule": {
+    "posts_per_week": 4,
+    "publish_days": ["monday", "wednesday", "friday", "saturday"],
+    "pins_per_day": 10,
+    "researcher_day": "monday",
+    "researcher_hour": 6,
+    "writer_hour": 7,
+    "analytics_day": "sunday"
+  },
+  "site_url": "https://velvetgrl.com"
+}

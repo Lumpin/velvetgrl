@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  autopilot:
+    build: .
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+      - ./queue:/app/queue
+      - ./website/src/content/blog:/app/website/src/content/blog
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    restart: unless-stopped
