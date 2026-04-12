@@ -1,0 +1,35 @@
+<div id="cookie-banner" class="fixed bottom-0 left-0 right-0 z-50 hidden">
+  <div class="bg-brand-dark/95 backdrop-blur-sm border-t border-white/10 px-4 py-4">
+    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center gap-4">
+      <p class="text-white/80 text-sm flex-1">
+        We use cookies for analytics to improve your experience. See our
+        <a href="/privacy/" class="text-brand-blush underline">Privacy Policy</a>.
+      </p>
+      <div class="flex gap-3 shrink-0">
+        <button id="cookie-reject" class="px-4 py-2 text-sm text-white/60 hover:text-white transition-colors">
+          Decline
+        </button>
+        <button id="cookie-accept" class="px-5 py-2 text-sm font-medium bg-brand-sage text-white rounded-full hover:bg-brand-sage/80 transition-colors">
+          Accept
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  (function() {
+    if (!document.cookie.includes('cookie_consent=')) {
+      document.getElementById('cookie-banner').classList.remove('hidden');
+    }
+    document.getElementById('cookie-accept')?.addEventListener('click', function() {
+      document.cookie = 'cookie_consent=accepted;path=/;max-age=31536000;SameSite=Lax';
+      document.getElementById('cookie-banner').classList.add('hidden');
+      window.dispatchEvent(new Event('cookie-consent-accepted'));
+    });
+    document.getElementById('cookie-reject')?.addEventListener('click', function() {
+      document.cookie = 'cookie_consent=rejected;path=/;max-age=31536000;SameSite=Lax';
+      document.getElementById('cookie-banner').classList.add('hidden');
+    });
+  })();
+</script>
