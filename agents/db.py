@@ -47,6 +47,7 @@ def _create_tables(conn: sqlite3.Connection) -> None:
             title TEXT NOT NULL,
             description TEXT NOT NULL,
             board TEXT NOT NULL,
+            tags TEXT NOT NULL DEFAULT '[]',
             status TEXT NOT NULL DEFAULT 'pending',
             posted_at TEXT,
             impressions INTEGER DEFAULT 0,

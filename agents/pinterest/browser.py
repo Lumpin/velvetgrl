@@ -1,9 +1,20 @@
 """Pinterest posting — uses the Pinterest API v5."""
 
+import json
 from pathlib import Path
 from agents.pinterest.api import create_pin as api_create_pin, check_token
 from agents.config import load_settings
 from agents.db import get_connection
+
+
+def _build_description(description: str, tags: list[str]) -> str:
+    """Build the final pin description with hashtags appended."""
+    hashtags = " ".join(f"#{t}" for t in tags) if tags else ""
+    if hashtags and hashtags not in description:
+        # Append hashtags if not already in the description
+        combined = f"{description.rstrip()}\n\n{hashtags}"
+        return combined[:500]
+    return description[:500]
 
 
 def create_pin(image_path: Path, title: str, description: str, board: str, url: str) -> bool:
@@ -30,7 +41,7 @@ def post_pins_for_post(slug: str) -> int:
     """Post all pending pins for a given blog post."""
     conn = get_connection()
     pins = conn.execute(
-        "SELECT id, image_path, title, description, board FROM pins WHERE post_slug = ? AND status = 'pending'",
+        "SELECT id, image_path, title, description, board, tags FROM pins WHERE post_slug = ? AND status = 'pending'",
         (slug,)
     ).fetchall()
 
@@ -44,10 +55,13 @@ def post_pins_for_post(slug: str) -> int:
     posted = 0
 
     for pin in pins:
+        tags = json.loads(pin["tags"]) if pin["tags"] else []
+        full_description = _build_description(pin["description"], tags)
+
         success = create_pin(
             image_path=Path(pin["image_path"]),
             title=pin["title"],
-            description=pin["description"],
+            description=full_description,
             board=pin["board"],
             url=post_url,
         )

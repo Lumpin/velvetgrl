@@ -175,19 +175,31 @@ def generate_pins_for_post(slug: str, title: str, category: str, count: int = 3)
 
 
 def generate_pin_copy(title: str, keywords: list[str], category: str) -> dict:
-    """Generate Pinterest pin title and description."""
+    """Generate SEO-optimized Pinterest pin copy with hashtags."""
     client = get_claude_client()
     response = client.messages.create(
         model="claude-sonnet-4-20250514",
-        max_tokens=500,
+        max_tokens=800,
         messages=[{
             "role": "user",
-            "content": f"""Write Pinterest pin copy for: "{title}"
+            "content": f"""Write SEO-optimized Pinterest pin copy for: "{title}"
 Keywords: {', '.join(keywords)}
 Category: {category}
 
+RULES:
+- pin_title: max 100 chars, front-load the primary keyword, make it compelling and searchable
+- pin_description: max 500 chars total (including hashtags). Write 2-3 sentences that:
+  * Open with the primary keyword phrase naturally
+  * Include secondary keywords woven in naturally (not stuffed)
+  * Add a clear CTA (e.g., "Click to see all 25!" or "Tap to read the full guide!")
+  * End with a line of 5-8 relevant hashtags (these count toward the 500 char limit)
+- tags: exactly 8-12 lowercase hashtags WITHOUT the # symbol. Mix of:
+  * High-volume broad tags (e.g., homedecor, fashion, nailart)
+  * Mid-volume niche tags (e.g., bohostyle, gelnails, kbeauty)
+  * Long-tail specific tags (e.g., diybohodecor, christmasnailart)
+
 Return JSON:
-{{"pin_title": "max 100 chars, keyword-rich, compelling", "pin_description": "max 500 chars, includes keywords naturally, ends with CTA to click through"}}
+{{"pin_title": "keyword-rich title", "pin_description": "SEO description ending with #hashtag #line", "tags": ["tag1", "tag2", "tag3"]}}
 
 Return ONLY JSON."""
         }]
@@ -206,14 +218,22 @@ def register_pins_in_db(slug: str, pin_paths: list[Path], title: str, keywords: 
         category_boards = ["General"]
 
     conn = get_connection()
+
+    # Ensure tags column exists
+    cols = [row[1] for row in conn.execute("PRAGMA table_info(pins)").fetchall()]
+    if "tags" not in cols:
+        conn.execute("ALTER TABLE pins ADD COLUMN tags TEXT NOT NULL DEFAULT '[]'")
+        conn.commit()
+
     for i, pin_path in enumerate(pin_paths):
         copy = generate_pin_copy(title, keywords, category)
         board = category_boards[i % len(category_boards)]
+        tags = copy.get("tags", [])
 
         conn.execute(
-            """INSERT INTO pins (post_slug, image_path, title, description, board, status)
-               VALUES (?, ?, ?, ?, ?, 'pending')""",
-            (slug, str(pin_path), copy["pin_title"], copy["pin_description"], board)
+            """INSERT INTO pins (post_slug, image_path, title, description, board, tags, status)
+               VALUES (?, ?, ?, ?, ?, ?, 'pending')""",
+            (slug, str(pin_path), copy["pin_title"], copy["pin_description"], board, json.dumps(tags))
         )
     conn.commit()
     conn.close()
