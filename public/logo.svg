@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" rx="40" fill="#2D2D2D"/>
+  <text x="200" y="175" text-anchor="middle" font-family="Georgia, 'Playfair Display', serif" font-size="88" font-weight="700" fill="#FFFFFF">velvet</text>
+  <text x="200" y="270" text-anchor="middle" font-family="Georgia, 'Playfair Display', serif" font-size="88" font-weight="700" fill="#B2C9AB">grl</text>
+  <rect x="120" y="290" width="160" height="3" rx="1.5" fill="#F4C2C2"/>
+</svg>
