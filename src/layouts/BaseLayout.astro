@@ -52,13 +52,13 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       function loadGA() {
         if (document.cookie.includes('cookie_consent=accepted')) {
           const s = document.createElement('script');
-          s.src = 'https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX';
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=G-SBTQ6WR2KE';
           s.async = true;
           document.head.appendChild(s);
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-          gtag('config', 'G-XXXXXXXXXX');
+          gtag('config', 'G-SBTQ6WR2KE');
         }
       }
       loadGA();
