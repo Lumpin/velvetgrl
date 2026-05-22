@@ -11,6 +11,8 @@ featured_image: "/images/posts/25-crystals-for-anxiety-and-stress-relief-you-nee
 
 Finding natural ways to manage anxiety and stress has never been more important, and healing crystals offer a beautiful, gentle approach to emotional wellness. Whether you're new to crystal healing or expanding your collection, these 25 powerful stones can help create calm, balance, and peace in your daily life.
 
+> **A gentle note:** Crystals are a complement to wellness — not a substitute for professional care. If you're experiencing persistent anxiety, panic, or stress, please reach out to a licensed mental health professional.
+
 ## 1. Amethyst
 
 ![Purple amethyst crystal cluster with natural formation](/images/posts/25-crystals-for-anxiety-and-stress-relief-you-need-to-know/01.png)

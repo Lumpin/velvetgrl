@@ -1,4 +1,5 @@
 ---
+import { CATEGORIES as categories } from '../data/categories';
 const year = new Date().getFullYear();
 ---
 
@@ -7,19 +8,16 @@ const year = new Date().getFullYear();
     <div class="grid md:grid-cols-3 gap-8">
       <div>
         <p class="font-display text-xl font-bold text-white mb-2">
-          velvet<span class="text-brand-sage">grl
+          velvet<span class="text-brand-sage">grl</span>
         </p>
         <p class="text-sm">Inspiration for the modern woman. Curated ideas for beauty, home, style, and soul.</p>
       </div>
       <div>
         <p class="font-medium text-white mb-3">Categories</p>
         <div class="grid grid-cols-2 gap-1 text-sm">
-          <a href="/boho-decor/" class="hover:text-brand-blush transition-colors">Boho Decor</a>
-          <a href="/tattoo-ideas/" class="hover:text-brand-blush transition-colors">Tattoo Ideas</a>
-          <a href="/nail-art/" class="hover:text-brand-blush transition-colors">Nail Art</a>
-          <a href="/fashion/" class="hover:text-brand-blush transition-colors">Fashion</a>
-          <a href="/makeup-beauty/" class="hover:text-brand-blush transition-colors">Makeup</a>
-          <a href="/hair-hairstyles/" class="hover:text-brand-blush transition-colors">Hair</a>
+          {categories.map(cat => (
+            <a href={`/${cat.slug}/`} class="hover:text-brand-blush transition-colors">{cat.name}</a>
+          ))}
         </div>
       </div>
       <div>
