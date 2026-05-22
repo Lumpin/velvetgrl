@@ -1,7 +1,8 @@
-import httpx
 from pathlib import Path
+
 from agents.claude_client import get_claude_client, parse_json_response
-from agents.config import load_settings, DATA_DIR
+from agents.config import DATA_DIR
+from agents.image_sourcer.flux_client import generate_image_to_file
 
 
 def generate_image_prompts(title: str, category: str, count: int = 4) -> list[str]:
@@ -30,36 +31,14 @@ Return ONLY the JSON array."""
 
 
 def generate_images(prompts: list[str], output_dir: Path) -> list[Path]:
-    """Generate images using Flux API."""
-    settings = load_settings()
-    api_key = settings.get("flux_api_key", "")
+    """Generate images using the shared rate-limited Flux client."""
     output_dir.mkdir(parents=True, exist_ok=True)
     paths = []
-
     for i, prompt in enumerate(prompts):
+        path = output_dir / f"gen_{i}.png"
         try:
-            response = httpx.post(
-                "https://api.together.xyz/v1/images/generations",
-                headers={"Authorization": f"Bearer {api_key}"},
-                json={
-                    "model": "black-forest-labs/FLUX.1-schnell",
-                    "prompt": prompt,
-                    "width": 512,
-                    "height": 512,
-                    "n": 1,
-                },
-                timeout=60,
-            )
-            response.raise_for_status()
-            data = response.json()
-
-            # Download the generated image
-            image_url = data["data"][0]["url"]
-            img_response = httpx.get(image_url, follow_redirects=True)
-            path = output_dir / f"gen_{i}.png"
-            path.write_bytes(img_response.content)
+            generate_image_to_file(prompt, path, width=512, height=512)
             paths.append(path)
         except Exception as e:
             print(f"Image generation failed for prompt {i}: {e}")
-
     return paths

@@ -14,9 +14,12 @@ def select_topics(count: int = 4) -> list[dict]:
     keywords = conn.execute(
         """SELECT keyword, category, search_volume_estimate, ad_value_score
            FROM keywords
-           WHERE keyword NOT IN (SELECT title FROM posts)
            ORDER BY search_volume_estimate DESC, ad_value_score DESC
-           LIMIT 50"""
+           LIMIT 80"""
+    ).fetchall()
+    # Already-published titles, grouped by category. Claude must avoid these.
+    existing = conn.execute(
+        "SELECT title, category FROM posts WHERE status IN ('published','approved','review')"
     ).fetchall()
     conn.close()
 
@@ -25,6 +28,9 @@ def select_topics(count: int = 4) -> list[dict]:
     winners = top_pins(limit=5)
 
     keyword_list = [dict(k) for k in keywords]
+    existing_by_cat: dict[str, list[str]] = {}
+    for row in existing:
+        existing_by_cat.setdefault(row["category"], []).append(row["title"])
 
     client = get_claude_client()
     response = client.messages.create(
@@ -49,12 +55,20 @@ Pick {count} blog post topics for this week. Each should be a listicle.
 == Top pins so far (use their patterns as inspiration) ==
 {json.dumps(winners, indent=2)}
 
+== ALREADY PUBLISHED — do NOT propose anything that overlaps with these ==
+{json.dumps(existing_by_cat, indent=2)}
+
 == Selection rules ==
 1. Honor the slot allocation strictly: hit the performer / exploration counts.
 2. Within performer slots, pick high-volume keywords from those categories.
 3. Within exploration slots, pick the highest-volume keywords from those categories,
    even if the category has zero performance data yet (that's the point — we need data).
 4. Listicle format: pick a specific number of items (13-31, odd numbers perform best).
+5. **Topic uniqueness is critical.** Each new title must be clearly different from the
+   ALREADY PUBLISHED list above — not just a swapped number or synonym. If a category
+   only has near-duplicate options left, pick a *different sub-niche* of that category
+   (e.g., if "blonde highlights on brown hair" exists, propose "money piece highlights"
+   or "balayage for short hair" instead — different sub-topic, not a remix).
 
 Return JSON array:
 [{{"title": "23 Minimalist Tattoo Ideas for First-Timers", "category": "tattoo-ideas",
