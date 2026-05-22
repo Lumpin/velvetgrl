@@ -17,8 +17,8 @@ def _build_description(description: str, tags: list[str]) -> str:
     return description[:500]
 
 
-def create_pin(image_path: Path, title: str, description: str, board: str, url: str) -> bool:
-    """Create a single pin on Pinterest via the API."""
+def create_pin(image_path: Path, title: str, description: str, board: str, url: str) -> str | None:
+    """Create a single pin on Pinterest via the API. Returns the Pinterest pin ID."""
     try:
         result = api_create_pin(
             image_path=image_path,
@@ -30,11 +30,11 @@ def create_pin(image_path: Path, title: str, description: str, board: str, url: 
         pin_id = result.get("id")
         if pin_id:
             print(f"  Pin created: {pin_id}")
-            return True
-        return False
+            return pin_id
+        return None
     except Exception as e:
         print(f"  Failed to create pin: {e}")
-        return False
+        return None
 
 
 def post_pins_for_post(slug: str) -> int:
@@ -58,15 +58,18 @@ def post_pins_for_post(slug: str) -> int:
         tags = json.loads(pin["tags"]) if pin["tags"] else []
         full_description = _build_description(pin["description"], tags)
 
-        success = create_pin(
+        pinterest_id = create_pin(
             image_path=Path(pin["image_path"]),
             title=pin["title"],
             description=full_description,
             board=pin["board"],
             url=post_url,
         )
-        if success:
-            conn.execute("UPDATE pins SET status = 'posted', posted_at = CURRENT_TIMESTAMP WHERE id = ?", (pin["id"],))
+        if pinterest_id:
+            conn.execute(
+                "UPDATE pins SET status = 'posted', posted_at = CURRENT_TIMESTAMP, pinterest_pin_id = ? WHERE id = ?",
+                (pinterest_id, pin["id"]),
+            )
             conn.commit()
             posted += 1
 

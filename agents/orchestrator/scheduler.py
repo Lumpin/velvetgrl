@@ -46,13 +46,15 @@ def create_scheduler() -> BlockingScheduler:
         name="Publish Check",
     )
 
-    # Analytics: weekly on Sunday
+    # Analytics: Sunday morning, before Monday's research run, so topic
+    # selection sees fresh numbers.
     analytics_day = schedule.get("analytics_day", "sunday")
+    analytics_hour = schedule.get("analytics_hour", 4)
     scheduler.add_job(
         _run_analytics,
-        CronTrigger(day_of_week=_day_abbrev(analytics_day), hour=20),
+        CronTrigger(day_of_week=_day_abbrev(analytics_day), hour=analytics_hour),
         id="analytics",
-        name="Weekly Analytics",
+        name="Weekly Analytics Collection",
     )
 
     return scheduler
@@ -66,8 +68,17 @@ def _publish_and_pin() -> None:
 
 
 def _run_analytics() -> None:
-    """Run analytics collection (placeholder)."""
-    console.print("[cyan]Analytics collection — not yet implemented[/cyan]")
+    """Pull Pinterest metrics for every posted pin and aggregate to post level."""
+    from agents.analytics.collector import run_weekly_collection
+    from agents.analytics.reporter import print_report
+
+    console.print("[cyan]Pulling Pinterest analytics...[/cyan]")
+    result = run_weekly_collection()
+    console.print(
+        f"[green]Analytics: fetched={result['fetched']} backfilled={result['backfilled']} "
+        f"errors={result['errors']}[/green]"
+    )
+    print_report()
 
 
 def _day_abbrev(day: str) -> str:

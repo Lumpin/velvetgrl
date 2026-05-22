@@ -16,7 +16,7 @@ API_BASE = "https://api.pinterest.com/v5"
 AUTH_URL = "https://www.pinterest.com/oauth/"
 TOKEN_URL = f"{API_BASE}/oauth/token"
 REDIRECT_URI = "http://localhost:9876/callback"
-SCOPES = "boards:read,boards:write,pins:read,pins:write"
+SCOPES = "boards:read,boards:write,pins:read,pins:write,user_accounts:read"
 
 _TOKEN_FILE = CONFIG_DIR / "pinterest_token.json"
 
@@ -149,6 +149,54 @@ def run_oauth_flow() -> dict:
     return tokens
 
 
+def delete_pin(pin_id: str) -> bool:
+    """Delete a pin from Pinterest. Returns True on success or if already gone."""
+    token = get_access_token()
+    r = _api_call("DELETE", f"{API_BASE}/pins/{pin_id}", token, timeout=15)
+    if r.status_code in (200, 204, 404):
+        return True
+    r.raise_for_status()
+    return False
+
+
+def update_pin(pin_id: str, *, title: str | None = None, description: str | None = None) -> dict:
+    """PATCH a pin's title and/or description."""
+    token = get_access_token()
+    payload: dict = {}
+    if title is not None:
+        payload["title"] = title[:100]
+    if description is not None:
+        payload["description"] = description[:500]
+    if not payload:
+        return {}
+    r = _api_call(
+        "PATCH", f"{API_BASE}/pins/{pin_id}", token,
+        headers={"Content-Type": "application/json"},
+        json=payload, timeout=30,
+    )
+    r.raise_for_status()
+    return r.json()
+
+
+def list_pins(page_size: int = 100) -> list[dict]:
+    """Fetch all pins for the authenticated user (paginated)."""
+    token = get_access_token()
+    pins = []
+    bookmark = None
+    while True:
+        params: dict = {"page_size": page_size}
+        if bookmark:
+            params["bookmark"] = bookmark
+        r = _api_call("GET", f"{API_BASE}/pins", token, params=params, timeout=30)
+        r.raise_for_status()
+        data = r.json()
+        pins.extend(data.get("items", []))
+        bookmark = data.get("bookmark")
+        if not bookmark:
+            break
+    return pins
+
+
 def get_boards() -> list[dict]:
     """Fetch all boards for the authenticated user."""
     token = get_access_token()
@@ -254,19 +302,33 @@ def create_pin(
     return r.json()
 
 
+def get_user_account() -> dict | None:
+    """Fetch the authenticated user's account info."""
+    token = get_access_token()
+    r = _api_call("GET", f"{API_BASE}/user_account", token)
+    if r.status_code == 200:
+        return r.json()
+    return None
+
+
 def check_token() -> dict | None:
-    """Validate the current token. Returns info dict or None."""
+    """Validate the current token. Returns user info dict or None.
+
+    Uses _api_call so an expired access token is auto-refreshed when the
+    refresh token is still valid.
+    """
     try:
         token = get_access_token()
     except ValueError:
         return None
 
-    r = httpx.get(
-        f"{API_BASE}/boards",
-        headers={"Authorization": f"Bearer {token}"},
-        params={"page_size": 1},
-        timeout=10,
-    )
+    # Try /user_account first (needs user_accounts:read). Fall back to /boards
+    # for older tokens that don't have that scope.
+    r = _api_call("GET", f"{API_BASE}/user_account", token)
     if r.status_code == 200:
-        return {"status": "connected"}
+        return r.json()
+
+    r = _api_call("GET", f"{API_BASE}/boards", token, params={"page_size": 1})
+    if r.status_code == 200:
+        return {"username": "unknown", "status": "connected"}
     return None

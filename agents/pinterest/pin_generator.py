@@ -105,8 +105,36 @@ def create_pin_collage(
     return canvas
 
 
-def generate_pin_title(post_title: str, category: str) -> dict:
-    """Use Claude to generate a clickbait pin title with highlight word."""
+# Pre-defined angles ensure each variation of a 3-pin set goes after a
+# distinct search intent, so we don't accidentally compete with ourselves.
+PIN_ANGLES = [
+    {"slug": "aspirational",  "hint": "Aspirational / dreamy — emphasize beauty, transformation, lifestyle vibe."},
+    {"slug": "practical",     "hint": "Practical / actionable — emphasize how-to, easy, step-by-step, beginner-friendly."},
+    {"slug": "trend",         "hint": "Trend-driven / current — emphasize this year, new, viral, must-try."},
+    {"slug": "value",         "hint": "Value / curation — emphasize 'best', 'editor's picks', 'top-rated'."},
+    {"slug": "specific",      "hint": "Specific use-case — narrow to a sub-audience (e.g., 'for short hair', 'under $50')."},
+]
+
+
+def generate_pin_title(
+    post_title: str,
+    category: str,
+    variation_index: int = 0,
+    previous_titles: list[str] | None = None,
+) -> dict:
+    """Use Claude to generate a clickbait pin title with highlight word.
+
+    Each variation_index pulls a distinct angle from PIN_ANGLES so a 3-pin set
+    targets three different search intents instead of restating the same hook.
+    """
+    angle = PIN_ANGLES[variation_index % len(PIN_ANGLES)]
+    avoid_block = ""
+    if previous_titles:
+        avoid_block = (
+            "\n\nALREADY USED for other variations of this post (must be clearly different):\n"
+            + "\n".join(f"- {t}" for t in previous_titles)
+        )
+
     client = get_claude_client()
     response = client.messages.create(
         model="claude-sonnet-4-20250514",
@@ -115,14 +143,16 @@ def generate_pin_title(post_title: str, category: str) -> dict:
             "role": "user",
             "content": f"""Generate a Pinterest pin title for this blog post: "{post_title}"
 
-The title should be:
+ANGLE for this variation: {angle['hint']}
+
+Requirements:
 - ALL CAPS
 - Format: [number] [ADJECTIVE] [keyword] IDEAS/DESIGNS/LOOKS!
 - Eye-catching and clickable
-- The adjective should be emotional/visual (STUNNING, DREAMY, MAGICAL, GORGEOUS, etc.)
-
-Also identify the single most emotional/visual word to highlight in a different color.
-Split the title into 2 lines for the pin graphic.
+- Adjective is emotional/visual (STUNNING, DREAMY, MAGICAL, GORGEOUS, EFFORTLESS, BUDGET, etc.)
+- Title must reflect the angle — don't just swap adjectives, change the framing.
+- Identify the single most emotional/visual word to highlight in a different color.
+- Split the title into 2 lines for the pin graphic.{avoid_block}
 
 Return JSON:
 {{"line1": "17 MAGICAL CAT", "line2": "TATTOO IDEAS!", "highlight_word": "MAGICAL", "number": 17}}
@@ -140,10 +170,16 @@ def generate_pins_for_post(slug: str, title: str, category: str, count: int = 3)
 
     accent_colors = ["#F4C2C2", "#B2C9AB", "#C9A96E", "#A8C4D9", "#D4A5A5"]
     generated_pins = []
+    used_titles: list[str] = []
 
     for variation in range(count):
-        # Generate title variation
-        pin_title = generate_pin_title(title, category)
+        # Generate title variation — each pulls a distinct angle and avoids prior siblings.
+        pin_title = generate_pin_title(
+            title, category,
+            variation_index=variation,
+            previous_titles=used_titles,
+        )
+        used_titles.append(f"{pin_title.get('line1','')} {pin_title.get('line2','')}".strip())
 
         # Generate AI images
         prompts = generate_image_prompts(title, category, count=4)
@@ -174,8 +210,31 @@ def generate_pins_for_post(slug: str, title: str, category: str, count: int = 3)
     return generated_pins
 
 
-def generate_pin_copy(title: str, keywords: list[str], category: str) -> dict:
-    """Generate SEO-optimized Pinterest pin copy with hashtags."""
+def generate_pin_copy(
+    title: str,
+    keywords: list[str],
+    category: str,
+    variation_index: int = 0,
+    previous_copy: list[dict] | None = None,
+) -> dict:
+    """Generate SEO-optimized Pinterest pin copy with hashtags.
+
+    Variation index pulls a distinct angle from PIN_ANGLES, and any
+    already-generated copy for sibling pins is supplied as a must-differ list.
+    """
+    angle = PIN_ANGLES[variation_index % len(PIN_ANGLES)]
+    avoid_block = ""
+    if previous_copy:
+        prior = "\n".join(
+            f"- title: {p.get('pin_title','')}\n  desc: {p.get('pin_description','')[:120]}..."
+            for p in previous_copy
+        )
+        avoid_block = (
+            "\n\nALREADY GENERATED for sibling pins of this post — your title and "
+            "description MUST take a clearly different angle (not just a synonym swap):\n"
+            + prior
+        )
+
     client = get_claude_client()
     response = client.messages.create(
         model="claude-sonnet-4-20250514",
@@ -186,8 +245,10 @@ def generate_pin_copy(title: str, keywords: list[str], category: str) -> dict:
 Keywords: {', '.join(keywords)}
 Category: {category}
 
+ANGLE for this variation: {angle['hint']}
+
 RULES:
-- pin_title: max 100 chars, front-load the primary keyword, make it compelling and searchable
+- pin_title: max 100 chars, front-load the primary keyword, reflect the angle above (don't just adjective-swap).
 - pin_description: max 500 chars total (including hashtags). Write 2-3 sentences that:
   * Open with the primary keyword phrase naturally
   * Include secondary keywords woven in naturally (not stuffed)
@@ -196,7 +257,7 @@ RULES:
 - tags: exactly 8-12 lowercase hashtags WITHOUT the # symbol. Mix of:
   * High-volume broad tags (e.g., homedecor, fashion, nailart)
   * Mid-volume niche tags (e.g., bohostyle, gelnails, kbeauty)
-  * Long-tail specific tags (e.g., diybohodecor, christmasnailart)
+  * Long-tail specific tags (e.g., diybohodecor, christmasnailart){avoid_block}
 
 Return JSON:
 {{"pin_title": "keyword-rich title", "pin_description": "SEO description ending with #hashtag #line", "tags": ["tag1", "tag2", "tag3"]}}
@@ -225,8 +286,14 @@ def register_pins_in_db(slug: str, pin_paths: list[Path], title: str, keywords: 
         conn.execute("ALTER TABLE pins ADD COLUMN tags TEXT NOT NULL DEFAULT '[]'")
         conn.commit()
 
+    prior_copy: list[dict] = []
     for i, pin_path in enumerate(pin_paths):
-        copy = generate_pin_copy(title, keywords, category)
+        copy = generate_pin_copy(
+            title, keywords, category,
+            variation_index=i,
+            previous_copy=prior_copy,
+        )
+        prior_copy.append(copy)
         board = category_boards[i % len(category_boards)]
         tags = copy.get("tags", [])
 

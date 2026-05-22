@@ -120,6 +120,59 @@ def report():
     print_report()
 
 
+@cli.command("collect")
+@click.option("--days", "-d", type=int, default=90, help="Pull metrics for the last N days (max 90)")
+def collect(days: int):
+    """Pull Pinterest analytics into the local DB."""
+    from agents.analytics.collector import run_weekly_collection, backfill_pinterest_ids, collect_all_pin_metrics
+
+    console.print("[cyan]Backfilling missing Pinterest pin IDs...[/cyan]")
+    backfilled = backfill_pinterest_ids()
+    console.print(f"  Backfilled: {backfilled}")
+
+    console.print(f"[cyan]Fetching analytics (last {days} days)...[/cyan]")
+    result = collect_all_pin_metrics(days=days)
+    console.print(
+        f"[green]Fetched {result['fetched']} pins, {result['errors']} errors.[/green]"
+    )
+
+
+@cli.command("insights")
+def insights_cmd():
+    """Show category performance + next-week slot allocation."""
+    from agents.analytics.insights import category_performance, slot_allocation, top_pins
+
+    perf = category_performance()
+    table = Table(title="Category Performance")
+    table.add_column("Category", style="cyan")
+    table.add_column("Posts", justify="right")
+    table.add_column("Impressions", justify="right")
+    table.add_column("Clicks", justify="right")
+    table.add_column("CTR", justify="right")
+    table.add_column("Signal")
+    for c in perf:
+        table.add_row(
+            c["category"], str(c["posts"]),
+            f"{c['impressions']:,}", f"{c['clicks']:,}",
+            f"{c['ctr']*100:.2f}%" if c["impressions"] else "—",
+            c["signal"],
+        )
+    console.print(table)
+
+    from agents.config import load_settings
+    posts_per_week = (load_settings().get("schedule") or {}).get("posts_per_week", 4)
+    alloc = slot_allocation(posts_per_week, perf)
+    console.print(f"\n[bold]Next week's slot plan ({posts_per_week} posts):[/bold]")
+    console.print(f"  Performer slots ({alloc['performer_slots']}): {alloc['top_categories'] or '—'}")
+    console.print(f"  Exploration slots ({alloc['exploration_slots']}): {alloc['explore_categories'] or '—'}")
+
+    pins = top_pins(limit=5)
+    if pins and any(p["impressions"] for p in pins):
+        console.print("\n[bold]Top pins so far:[/bold]")
+        for p in pins:
+            console.print(f"  [{p['board']}] {p['title'][:60]} — {p['impressions']:,} imp / {p['clicks']:,} clicks")
+
+
 @cli.command("run")
 @click.option("--once", is_flag=True, help="Run one cycle and exit")
 def run(once: bool):
@@ -188,13 +241,18 @@ def pinterest_auth():
 @pinterest.command("test")
 def pinterest_test():
     """Test Pinterest API connection."""
-    from agents.pinterest.api import check_token
+    from agents.pinterest.api import check_token, _load_tokens
 
     user = check_token()
     if user:
-        console.print(f"[green]Connected as: {user.get('username', 'unknown')}[/green]")
+        username = user.get("username", "unknown")
+        console.print(f"[green]Connected as:[/green] {username}")
+        return
+
+    if _load_tokens():
+        console.print("[red]Token is invalid or expired.[/red] Re-authenticate: python -m agents pin auth")
     else:
-        console.print("[red]Not authenticated. Run: python -m agents pin auth[/red]")
+        console.print("[red]No token found.[/red] Authenticate: python -m agents pin auth")
 
 
 @pinterest.command("boards")
@@ -230,6 +288,87 @@ def pinterest_post(slug: str):
     from agents.pinterest.browser import post_pins_for_post
     posted = post_pins_for_post(slug)
     console.print(f"[green]Posted {posted} pins for {slug}[/green]")
+
+
+@pinterest.command("refresh")
+@click.option("--slug", "-s", default=None, help="Refresh pins for one slug only")
+@click.option("--dry-run", is_flag=True, help="Show changes without calling Pinterest")
+@click.option("--limit", "-n", type=int, default=None, help="Cap number of posts processed")
+def pinterest_refresh(slug: str | None, dry_run: bool, limit: int | None):
+    """Regenerate copy for already-posted pins and PATCH them on Pinterest.
+
+    Note: PATCH requires the Pinterest pin_edit permission (app review). For
+    accounts without it, use `pin recreate` instead, which deletes + reposts.
+    """
+    from agents.pinterest.refresh import refresh_all, refresh_post_pins
+    if slug:
+        out = refresh_post_pins(slug, dry_run=dry_run)
+        console.print(f"[green]Refreshed {out['refreshed']} pin(s) for {slug}[/green]")
+    else:
+        out = refresh_all(dry_run=dry_run, limit=limit)
+        console.print(f"[green]Refreshed {out['refreshed_pins']} pin(s) across {out['posts']} post(s)[/green]")
+
+
+@pinterest.command("recreate")
+@click.argument("slugs", nargs=-1)
+@click.option("--dry-run", is_flag=True, help="Show what would change without touching Pinterest")
+def pinterest_recreate(slugs: tuple[str, ...], dry_run: bool):
+    """Delete + repost all pins for the given post slugs.
+
+    Reuses existing background images on disk (no Flux regeneration). The new
+    prompt produces 3 distinct angles per post. Pin IDs change; analytics reset.
+    """
+    from agents.pinterest.refresh import recreate_post_pins
+    if not slugs:
+        console.print("[red]Provide at least one slug.[/red]")
+        return
+    total = 0
+    for slug in slugs:
+        console.print(f"\n[cyan]Recreating: {slug}[/cyan]")
+        out = recreate_post_pins(slug, dry_run=dry_run)
+        if "error" in out:
+            console.print(f"  [red]{out['error']}[/red]")
+        else:
+            console.print(f"  Recreated: {out.get('recreated', 0)}")
+            total += out.get("recreated", 0)
+    console.print(f"\n[green]Recreated {total} pin(s) total.[/green]")
+
+
+@pinterest.command("post-all")
+@click.option("--limit", "-n", type=int, default=None, help="Max pins to post across all posts")
+@click.option("--dry-run", is_flag=True, help="Show what would be posted without actually posting")
+def pinterest_post_all(limit: int | None, dry_run: bool):
+    """Post all pending pins across every blog post via the Pinterest API."""
+    from agents.pinterest.browser import post_pins_for_post
+    conn = get_connection()
+    rows = conn.execute(
+        "SELECT post_slug, COUNT(*) AS n FROM pins WHERE status='pending' GROUP BY post_slug ORDER BY post_slug"
+    ).fetchall()
+    conn.close()
+
+    if not rows:
+        console.print("[dim]No pending pins.[/dim]")
+        return
+
+    table = Table(title="Pending Pins")
+    table.add_column("Slug", style="cyan")
+    table.add_column("Count", style="green")
+    for r in rows:
+        table.add_row(r["post_slug"], str(r["n"]))
+    console.print(table)
+
+    if dry_run:
+        console.print("[yellow]Dry run — nothing posted.[/yellow]")
+        return
+
+    total_posted = 0
+    for r in rows:
+        if limit is not None and total_posted >= limit:
+            break
+        console.print(f"\n[cyan]Posting pins for: {r['post_slug']}[/cyan]")
+        total_posted += post_pins_for_post(r["post_slug"])
+
+    console.print(f"\n[green]Posted {total_posted} pin(s) total.[/green]")
 
 
 if __name__ == "__main__":

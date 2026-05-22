@@ -63,4 +63,16 @@ def _create_tables(conn: sqlite3.Connection) -> None:
             created_at TEXT DEFAULT CURRENT_TIMESTAMP
         );
     """)
+    _migrate(conn)
     conn.commit()
+
+
+def _migrate(conn: sqlite3.Connection) -> None:
+    """Add any columns missing on existing databases (idempotent)."""
+    pin_cols = {row[1] for row in conn.execute("PRAGMA table_info(pins)")}
+    if "tags" not in pin_cols:
+        conn.execute("ALTER TABLE pins ADD COLUMN tags TEXT NOT NULL DEFAULT '[]'")
+    if "pinterest_pin_id" not in pin_cols:
+        conn.execute("ALTER TABLE pins ADD COLUMN pinterest_pin_id TEXT")
+    if "metrics_updated_at" not in pin_cols:
+        conn.execute("ALTER TABLE pins ADD COLUMN metrics_updated_at TEXT")

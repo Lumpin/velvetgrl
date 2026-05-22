@@ -1,12 +1,47 @@
 import json
+import os
 from pathlib import Path
 
-CONFIG_DIR = Path(__file__).parent.parent / "config"
-QUEUE_DIR = Path(__file__).parent.parent / "queue"
-DATA_DIR = Path(__file__).parent.parent / "data"
-WEBSITE_DIR = Path(__file__).parent.parent / "website"
+PROJECT_ROOT = Path(__file__).parent.parent
+CONFIG_DIR = PROJECT_ROOT / "config"
+QUEUE_DIR = PROJECT_ROOT / "queue"
+DATA_DIR = PROJECT_ROOT / "data"
+WEBSITE_DIR = PROJECT_ROOT / "website"
 BLOG_DIR = WEBSITE_DIR / "src" / "content" / "blog"
 IMAGES_DIR = WEBSITE_DIR / "public" / "images" / "posts"
+
+_ENV_LOADED = False
+
+
+def _load_env_file() -> None:
+    """Load .env into os.environ (idempotent, no dependency on python-dotenv)."""
+    global _ENV_LOADED
+    if _ENV_LOADED:
+        return
+    env_path = PROJECT_ROOT / ".env"
+    if env_path.exists():
+        for raw in env_path.read_text().splitlines():
+            line = raw.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, _, value = line.partition("=")
+            key = key.strip()
+            value = value.strip().strip('"').strip("'")
+            os.environ.setdefault(key, value)
+    _ENV_LOADED = True
+
+
+# Map of settings.json keys → environment variable names.
+_ENV_OVERRIDES = {
+    "anthropic_api_key": "ANTHROPIC_API_KEY",
+    "flux_api_key": "FLUX_API_KEY",
+    "unsplash_access_key": "UNSPLASH_ACCESS_KEY",
+    "pexels_api_key": "PEXELS_API_KEY",
+    "pinterest_app_id": "PINTEREST_APP_ID",
+    "pinterest_app_secret": "PINTEREST_APP_SECRET",
+    "pinterest_email": "PINTEREST_EMAIL",
+    "pinterest_password": "PINTEREST_PASSWORD",
+}
 
 CATEGORIES = {
     "boho-decor": "Boho Decor & Home",
@@ -25,11 +60,21 @@ CATEGORIES = {
 
 
 def load_settings() -> dict:
-    """Load settings from config/settings.json."""
+    """Load settings from config/settings.json, overlayed with .env values.
+
+    Environment variables (set directly or in .env) win over values in
+    settings.json — this lets ops rotate secrets without editing the file.
+    """
+    _load_env_file()
     settings_path = CONFIG_DIR / "settings.json"
-    if settings_path.exists():
-        return json.loads(settings_path.read_text())
-    return {}
+    settings = json.loads(settings_path.read_text()) if settings_path.exists() else {}
+
+    for setting_key, env_key in _ENV_OVERRIDES.items():
+        env_value = os.environ.get(env_key)
+        if env_value:
+            settings[setting_key] = env_value
+
+    return settings
 
 
 def load_boards() -> dict:

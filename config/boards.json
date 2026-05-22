@@ -1,26 +1,17 @@
 {
   "boards": [
-    {"name": "Boho Home Inspiration", "category": "boho-decor", "description": "Bohemian home decor ideas, boho kitchens, bedrooms, and living spaces. Free-spirited interior design."},
-    {"name": "Bohemian Decor Ideas", "category": "boho-decor", "description": "Earthy, textured, and warm boho decor inspiration for every room."},
-    {"name": "Tattoo Inspiration", "category": "tattoo-ideas", "description": "Beautiful tattoo ideas for women. Minimalist, floral, symbolic, and artistic tattoo designs."},
-    {"name": "Minimalist Tattoos", "category": "tattoo-ideas", "description": "Clean, simple, and elegant minimalist tattoo ideas."},
-    {"name": "Tattoo Ideas for Women", "category": "tattoo-ideas", "description": "Curated tattoo designs — small tattoos, wrist tattoos, and meaningful ink."},
-    {"name": "Nail Art Ideas", "category": "nail-art", "description": "Stunning nail art designs, manicure ideas, and nail trends."},
-    {"name": "Nail Designs", "category": "nail-art", "description": "Gel nails, acrylic nails, and creative nail art inspiration."},
-    {"name": "Fashion Inspiration", "category": "fashion", "description": "Outfit ideas and fashion inspiration for the modern woman."},
-    {"name": "Outfit Ideas", "category": "fashion", "description": "Casual, date night, work, and street style outfit inspiration."},
-    {"name": "Tarot & Divination", "category": "tarot-spirituality", "description": "Tarot card meanings, spreads, and spiritual guidance."},
+    {"name": "Boho", "category": "boho-decor", "description": "Bohemian home decor ideas, boho kitchens, bedrooms, and living spaces. Free-spirited, earthy, textured interior design."},
+    {"name": "Tattoos", "category": "tattoo-ideas", "description": "Beautiful tattoo ideas for women — minimalist, floral, symbolic, and artistic tattoo designs."},
+    {"name": "Nails", "category": "nail-art", "description": "Stunning nail art designs, gel and acrylic manicure ideas, and the latest nail trends."},
+    {"name": "Fashion Inspiration", "category": "fashion", "description": "Outfit ideas and fashion inspiration for the modern woman — casual, date night, work, and street style."},
     {"name": "Spiritual Living", "category": "tarot-spirituality", "description": "Crystals, manifestation, moon rituals, and spiritual wellness."},
-    {"name": "Kitchen Inspiration", "category": "kitchen-recipes", "description": "Easy recipes, kitchen ideas, and cooking inspiration."},
-    {"name": "Easy Recipes", "category": "kitchen-recipes", "description": "Quick and delicious recipes for everyday cooking."},
+    {"name": "Tarot & Divination", "category": "tarot-spirituality", "description": "Tarot card meanings, spreads, and spiritual guidance."},
+    {"name": "Kitchen Inspiration", "category": "kitchen-recipes", "description": "Easy recipes, kitchen ideas, and quick everyday cooking inspiration."},
     {"name": "Perfume Collection", "category": "perfume-fragrance", "description": "Best perfumes for women, luxury fragrances, and scent recommendations."},
-    {"name": "Makeup Looks", "category": "makeup-beauty", "description": "Makeup tutorials, beauty looks, and product recommendations."},
-    {"name": "Beauty Inspiration", "category": "makeup-beauty", "description": "Beauty tips, skincare, and makeup ideas."},
-    {"name": "Hairstyle Inspiration", "category": "hair-hairstyles", "description": "Hairstyle ideas, hair color trends, braids, and tutorials."},
-    {"name": "Hair Color Ideas", "category": "hair-hairstyles", "description": "Blonde, brunette, red, and creative hair color inspiration."},
+    {"name": "Makeup & Beauty", "category": "makeup-beauty", "description": "Makeup tutorials, beauty looks, skincare, and product recommendations."},
+    {"name": "Hair Inspiration", "category": "hair-hairstyles", "description": "Hairstyle ideas, hair color trends, braids, and tutorials — blonde, brunette, red, and beyond."},
     {"name": "Jewelry Inspiration", "category": "jewelry-accessories", "description": "Layered necklaces, rings, ear piercings, and accessory ideas."},
-    {"name": "Self-Care Ideas", "category": "self-care-wellness", "description": "Self-care routines, journaling, skincare, and wellness tips."},
-    {"name": "Wedding Inspiration", "category": "wedding-bridal", "description": "Wedding dresses, decor, bridal beauty, and wedding planning."},
-    {"name": "Bridal Beauty", "category": "wedding-bridal", "description": "Bridal makeup, wedding hairstyles, and bridal nail art."}
+    {"name": "Self-Care", "category": "self-care-wellness", "description": "Self-care routines, journaling, skincare, and wellness tips."},
+    {"name": "Wedding Inspiration", "category": "wedding-bridal", "description": "Wedding dresses, decor, bridal beauty, bridal makeup, wedding hairstyles, and planning."}
   ]
 }
